@@ -1,0 +1,14 @@
+{
+  "name": "quickfact",
+  "private": true,
+  "packageManager": "pnpm@11.19.0",
+  "engines": {
+    "node": ">=22.18.0 <25"
+  },
+  "scripts": {
+    "dev:web": "pnpm --filter @quickfact/web dev",
+    "dev:api": "pnpm --filter @quickfact/api start:dev",
+    "build": "pnpm --recursive --if-present build",
+    "typecheck": "pnpm --recursive --if-present typecheck"
+  }
+}
