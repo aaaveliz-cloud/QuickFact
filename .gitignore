@@ -1,0 +1,44 @@
+# Entorno Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+
+# Variables de entorno
+.env
+.env.*
+!.env.example
+
+# Certificados y firmas electrónicas
+*.p12
+*.pfx
+*.pem
+*.key
+*.cer
+*.crt
+
+# Archivos temporales
+*.log
+*.tmp
+*.temp
+
+# Archivos generados
+*.xml
+*.pdf
+
+# Base de datos local
+*.db
+*.sqlite
+*.sqlite3
+
+# Node / Frontend
+node_modules/
+.next/
+dist/
+build/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
