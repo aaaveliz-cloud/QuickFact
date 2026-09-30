@@ -1,0 +1,1818 @@
+# PROMPT MAESTRO DE CONTINUIDAD — QUICKFACT
+
+Vas a continuar el desarrollo de un proyecto existente llamado QUICKFACT.
+
+IMPORTANTE:
+Este proyecto NO empieza desde cero.
+
+Ya existe código y ya hubo trabajo previo de arquitectura y estructura inicial.
+Debes INSPECCIONAR el repositorio completo antes de modificarlo.
+
+NO reemplaces el proyecto por uno nuevo.
+NO elimines funcionalidades existentes solo para simplificar.
+NO cambies decisiones funcionales ya aprobadas.
+NO inventes funcionalidades.
+NO implementes todo de una sola vez.
+
+Tu trabajo es continuar el proyecto existente hasta convertirlo en una aplicación funcional y desplegable.
+
+==================================================
+A. REGLAS DE TRABAJO
+==================================================
+
+Antes de realizar cambios:
+
+1. Inspecciona todo el repositorio.
+2. Lee README, package.json, configuración, Prisma, frontend y backend.
+3. Determina exactamente qué está terminado.
+4. Determina qué está incompleto.
+5. Detecta errores de arquitectura.
+6. Detecta problemas de seguridad.
+7. Detecta problemas de multi-tenancy.
+8. Detecta inconsistencias con esta especificación.
+9. Conserva todo lo correcto.
+10. Corrige únicamente lo necesario.
+
+No asumas que una "fase" está terminada solamente porque existan archivos relacionados.
+
+Comprueba que realmente funcione.
+
+Después de cada fase:
+
+- ejecutar build;
+- ejecutar lint si existe;
+- ejecutar typecheck si existe;
+- ejecutar pruebas disponibles;
+- corregir errores;
+- verificar migraciones;
+- verificar seguridad;
+- verificar aislamiento multiempresa;
+- verificar que no se rompieron funciones anteriores.
+
+Haz commits pequeños y descriptivos cuando corresponda.
+
+==================================================
+B. OBJETIVO
+==================================================
+
+QuickFact será un SaaS web de facturación electrónica para Ecuador.
+
+Debe ser MULTIEMPRESA / MULTI-TENANT.
+
+Cada empresa tendrá independientemente:
+
+- RUC
+- datos empresariales
+- logo
+- establecimientos
+- puntos de emisión
+- firma electrónica
+- productos/servicios
+- stock
+- clientes
+- usuarios
+- permisos
+- comprobantes
+- retenciones recibidas
+- reportes
+- consumo
+- facturación programada/recurrente
+
+REGLA CRÍTICA:
+
+UNA EMPRESA JAMÁS PUEDE ACCEDER A INFORMACIÓN DE OTRA EMPRESA.
+
+Esto debe garantizarse en BACKEND y BASE DE DATOS.
+
+No confiar en filtros del frontend.
+
+==================================================
+C. ARQUITECTURA / INFRAESTRUCTURA OBJETIVO
+==================================================
+
+Mantén el stack existente si es razonable.
+
+La arquitectura prevista actualmente es:
+
+FRONTEND:
+Next.js + TypeScript
+Deploy: Vercel
+
+BACKEND:
+Node.js / Express + TypeScript
+Deploy: Render
+
+ORM:
+Prisma
+
+BASE DE DATOS:
+PostgreSQL
+
+CONTROL DE VERSIONES:
+Git + GitHub
+
+INFRAESTRUCTURA FINAL:
+
+LOCAL
+ ↓
+Git
+ ↓
+GitHub
+ ├── Frontend → Vercel
+ └── Backend → Render
+                  ↓
+              PostgreSQL
+
+Antes de cambiar este stack, debe existir una razón técnica fuerte.
+
+==================================================
+D. NAVEGACIÓN QUICKFACT
+==================================================
+
+QUICKFACT
+
+🏠 Inicio
+
+🧾 Emisión de comprobantes
+
+📥 Retenciones recibidas
+
+📊 Reportería
+
+⚙️ Configuración
+
+Los tres módulos principales de negocio son:
+
+1. Emisión de comprobantes
+2. Retenciones recibidas
+3. Reportería
+
+Inicio y Configuración NO son módulos de negocio.
+
+==================================================
+E. ROLES
+==================================================
+
+Existen:
+
+1. OWNER QUICKFACT
+2. ADMINISTRADOR DE EMPRESA
+3. USUARIO ADICIONAL
+
+----------------------------------------
+OWNER
+----------------------------------------
+
+Tiene acceso global.
+
+Panel:
+
+ADMIN QUICKFACT
+
+- Empresas
+- Usuarios
+- Planes / límites
+- Consumo
+- Certificados
+- Administración
+
+Puede gestionar todas las empresas.
+
+----------------------------------------
+ADMINISTRADOR DE EMPRESA
+----------------------------------------
+
+Administra su empresa.
+
+Puede:
+
+- emitir
+- configurar empresa
+- productos
+- stock
+- establecimientos
+- puntos
+- firma
+- usuarios
+- permisos
+- retenciones
+- reportes
+- programados
+
+----------------------------------------
+USUARIO ADICIONAL
+----------------------------------------
+
+Pertenece a UNA empresa.
+
+Funciona mediante permisos granulares.
+
+==================================================
+F. AUTENTICACIÓN
+==================================================
+
+Login:
+
+USUARIO + CONTRASEÑA
+
+NO utilizar correo electrónico como credencial.
+
+Usuario:
+
+- nombres
+- apellidos
+- cédula
+- RUC
+- teléfono
+- username
+- password
+- rol
+- estado
+
+Passwords:
+
+- hash seguro
+- nunca plaintext
+- nunca logs
+- nunca GitHub
+
+Debe existir:
+
+- login
+- logout
+- sesión/token seguro
+- protección de rutas
+- autorización backend
+- validación de empresa
+- validación de permisos
+
+Un usuario pertenece a una sola empresa, excepto el Owner global.
+
+El Administrador puede desactivar usuarios sin eliminar su historial.
+
+Puede restablecer/cambiar contraseña.
+
+==================================================
+G. PERMISOS
+==================================================
+
+Usuarios adicionales:
+
+COMPROBANTES
+
+- crear factura
+- crear NC
+- crear ND
+- crear guía
+- anular
+- reintentar rechazado
+
+RETENCIONES
+
+- cargar XML
+- consultar
+- descargar XML
+- relacionar manualmente
+
+REPORTES
+
+- consultar
+- Excel
+- PDF
+
+PROGRAMADOS
+
+- crear
+- editar
+- pausar/reanudar
+- cancelar
+- consultar
+
+PRODUCTOS
+
+- consultar
+- crear
+- editar
+- activar/desactivar
+
+NO permitir al usuario adicional:
+
+- cambiar firma
+- administrar establecimientos sensibles
+- administrar puntos sensibles
+- administrar usuarios
+- cambiar límites
+- ajustar stock manualmente
+
+El Admin de empresa tiene permisos operativos/configuración de su empresa.
+
+El Owner tiene control global.
+
+Los permisos SIEMPRE deben validarse en backend.
+
+==================================================
+H. CREACIÓN DE EMPRESA
+==================================================
+
+El Owner crea:
+
+EMPRESA + ADMINISTRADOR
+
+EN EL MISMO FLUJO/FORMULARIO.
+
+Empresa:
+
+- RUC
+- razón social
+- nombre comercial
+- dirección matriz
+- teléfono
+- email empresarial
+- datos tributarios necesarios
+- período anual
+- límite de documentos
+- límite de usuarios
+
+Administrador:
+
+- nombres
+- apellidos
+- cédula
+- RUC
+- teléfono
+- username
+- password
+- confirmación
+
+Predeterminado:
+
+3 usuarios totales
+
+1 Admin
+2 adicionales
+
+15 comprobantes anuales.
+
+Owner puede modificar límites.
+
+==================================================
+I. PERÍODO ANUAL
+==================================================
+
+Cada empresa tiene período anual independiente.
+
+Ejemplo:
+
+23/09/2026 → 23/09/2027
+
+Renovación:
+
+23/09/2027 → 23/09/2028
+
+Conservar todos los períodos históricos.
+
+Owner controla:
+
+- inicio
+- vencimiento
+- límite documentos
+- límite usuarios
+- renovación
+
+NO crear alerta al cliente por vencimiento anual.
+
+==================================================
+J. CONSUMO
+==================================================
+
+Implementar LEDGER de consumo.
+
+AUTORIZADO:
+
+consume 1.
+
+RECHAZADO:
+
+consume 0.
+
+PROGRAMADO NO EMITIDO:
+
+consume 0.
+
+RETENCIÓN RECIBIDA:
+
+consume 0.
+
+ANULADO DESPUÉS DE AUTORIZARSE:
+
+NO devuelve consumo.
+
+Al llegar a 0:
+
+BLOQUEAR nuevas emisiones que consuman.
+
+NO bloquear:
+
+- acceso
+- consultas
+- historial
+- reportes
+- retenciones
+- configuración
+
+CRÍTICO:
+
+El consumo debe ser idempotente y transaccional.
+
+Una autorización nunca puede consumir dos veces por reintento técnico.
+
+==================================================
+K. EMPRESA / LOGO
+==================================================
+
+Logo:
+
+- PNG/JPG
+- recomendado 200x200
+- PNG preferido
+
+Owner y Admin pueden cambiarlo.
+
+Aparece en RIDE.
+
+NO aparece en XML.
+
+Cambiar logo NO modifica RIDE históricos.
+
+==================================================
+L. FIRMA ELECTRÓNICA
+==================================================
+
+Una firma ACTIVA por empresa.
+
+ÚNICAMENTE:
+
+.p12
+
+Owner/Admin pueden cargar/reemplazar.
+
+Validar:
+
+- formato
+- contraseña
+- certificado
+- vigencia
+- identidad/RUC cuando técnicamente corresponda
+
+Nunca guardar contraseña plaintext.
+
+Proteger certificados y claves.
+
+NUNCA GitHub.
+
+Firma nueva:
+
+se convierte en activa.
+
+Firma anterior:
+
+no se usa en nuevas emisiones.
+
+Históricos:
+
+no cambian.
+
+Programados:
+
+usan firma activa al momento real de emisión.
+
+Firma vencida:
+
+bloquea nuevas emisiones.
+
+Owner debe poder ver:
+
+ACTIVA
+POR VENCER
+VENCIDA
+SIN CERTIFICADO
+
+==================================================
+M. ESTABLECIMIENTOS / PUNTOS
+==================================================
+
+Múltiples establecimientos.
+
+Múltiples puntos por establecimiento.
+
+Ejemplo:
+
+001-001-000000001
+
+Secuencia por:
+
+ESTABLECIMIENTO + PUNTO
+
+Numeración generada SERVER-SIDE.
+
+Nunca confiar en frontend.
+
+Punto nuevo:
+
+000000001
+
+Si existe numeración previa:
+
+permitir configurar último número y continuar desde siguiente.
+
+No eliminar puntos históricos.
+
+Desactivar.
+
+Programados NO reservan secuencia anticipadamente.
+
+==================================================
+N. PRODUCTOS / SERVICIOS
+==================================================
+
+Campos:
+
+- código
+- descripción
+- tipo PRODUCTO/SERVICIO
+- precio predeterminado
+- IVA 0%
+- IVA 5%
+- IVA 15%
+- maneja stock
+- estado
+
+En factura se puede modificar:
+
+- cantidad
+- precio
+- descuento
+- IVA
+
+Eso NO modifica catálogo.
+
+==================================================
+O. STOCK
+==================================================
+
+Factura autorizada:
+
+DESCUENTA STOCK.
+
+Permitir stock negativo.
+
+Guía:
+
+NO cambia stock.
+
+NC:
+
+NO restaura automáticamente stock en V1.
+
+Owner/Admin:
+
+pueden realizar ajuste manual.
+
+Auditar:
+
+- usuario
+- fecha
+- anterior
+- nuevo
+- motivo
+
+Usuarios adicionales:
+
+NO pueden hacer ajustes manuales.
+
+==================================================
+P. CONCEPTOS MANUALES
+==================================================
+
+Configuración controlada por OWNER:
+
+¿Permitir conceptos manuales?
+
+Sí/No.
+
+Si Sí:
+
+- descripción
+- cantidad
+- precio
+- descuento
+- IVA
+
+No guardar automáticamente en catálogo.
+
+==================================================
+Q. CLIENTES
+==================================================
+
+NO crear módulo independiente de clientes.
+
+Cliente se gestiona desde factura.
+
+Identificación nueva:
+
+permitir llenar datos.
+
+Existente:
+
+autocompletar.
+
+Datos editables.
+
+Al editar:
+
+actualizar registro de cliente.
+
+Factura autorizada:
+
+guardar SNAPSHOT de datos del cliente.
+
+Cambios posteriores:
+
+NO alteran históricos.
+
+==================================================
+R. COMPROBANTES V1
+==================================================
+
+HABILITADOS:
+
+- Factura
+- Nota de Crédito
+- Nota de Débito
+- Guía de Remisión
+
+NO habilitados inicialmente:
+
+- Retención emitida
+- Liquidación de compra
+
+No agregarlos sin instrucción.
+
+==================================================
+S. FACTURA
+==================================================
+
+Pantalla:
+
+1. DATOS EMISIÓN
+
+- establecimiento
+- punto
+- secuencia
+- fecha
+
+2. CLIENTE
+
+3. DETALLES
+
+- producto/concepto
+- código
+- descripción
+- cantidad
+- precio
+- descuento
+- IVA
+
+4. INFORMACIÓN ADICIONAL DEL DETALLE
+
+5. INFORMACIÓN ADICIONAL GENERAL
+
+Nombre | Valor
+
+6. FORMAS DE PAGO
+
+7. SOPORTE
+
+8. TOTALES
+
+SUBTOTAL IVA 0%
+SUBTOTAL IVA 5%
+SUBTOTAL IVA 15%
+
+BASE ANTES DE IMPUESTOS
+
+IVA TOTAL
+
+TOTAL
+
+==================================================
+T. FORMAS DE PAGO
+==================================================
+
+Permitir múltiples.
+
+Opciones iniciales:
+
+01 Efectivo
+16 Tarjeta débito
+19 Tarjeta crédito
+20 Transferencia bancaria
+21 Crédito
+
+Suma formas pago = total factura.
+
+Crédito:
+
+registrar plazo/unidad cuando corresponda.
+
+==================================================
+U. GUARDAR COMPROBANTE
+==================================================
+
+Botón:
+
+GUARDAR COMPROBANTE
+
+Confirmación:
+
+¿Está seguro de guardar este comprobante?
+
+Una vez confirmado, el comprobante será procesado y enviado al SRI para su autorización.
+
+[CANCELAR]
+
+[SÍ, GUARDAR]
+
+Internamente:
+
+GENERAR XML
+↓
+FIRMAR
+↓
+ENVIAR SRI
+↓
+PROCESAR RESPUESTA
+
+No mostrar proceso técnico al usuario.
+
+AUTORIZADO:
+
+- conservar XML autorizado
+- conservar RIDE
+- autorización
+- clave de acceso
+- consumo
+- stock cuando corresponda
+- correo cliente
+- volver Inicio
+
+Todo el proceso crítico debe ser transaccional/idempotente cuando corresponda.
+
+==================================================
+V. RECHAZADOS
+==================================================
+
+Conservar:
+
+- número
+- XML
+- datos
+- error/código SRI
+- historial intentos
+
+Botón:
+
+VOLVER A GENERAR COMPROBANTE
+
+Permitir corregir y reintentar.
+
+No consumir hasta autorización.
+
+Decisión funcional:
+
+mantener numeración al reintentar.
+
+PERO:
+
+NO IMPLEMENTAR ESTA REGLA CONTRA SRI HASTA VERIFICAR DOCUMENTACIÓN OFICIAL VIGENTE.
+
+==================================================
+W. NOTA DE CRÉDITO
+==================================================
+
+Solo desde factura:
+
+AUTORIZADA + ACTIVA.
+
+No:
+
+- rechazada
+- procesando
+- anulada
+
+Parcial o total.
+
+Puede seleccionar líneas.
+
+Valor NO superior al original.
+
+Factura original permanece.
+
+NC:
+
+- secuencia propia
+- XML
+- RIDE
+- autorización
+- consumo 1 cuando autorizada
+
+==================================================
+X. NOTA DE DÉBITO
+==================================================
+
+Implementación sencilla conforme SRI.
+
+Considerar:
+
+- documento relacionado
+- fecha
+- motivo
+- valor modificación
+- impuestos
+- totales
+- información adicional
+
+Secuencia propia.
+
+Consume 1 autorizada.
+
+==================================================
+Y. GUÍA
+==================================================
+
+Implementación básica conforme SRI.
+
+Considerar:
+
+- motivo traslado
+- fecha inicio
+- fecha fin
+- origen
+- destino
+- destinatario
+- transportista
+- identificación
+- placa
+- productos
+- relación factura cuando corresponda
+
+NO modifica stock.
+
+==================================================
+Z. SOPORTE PDF
+==================================================
+
+SOLO FACTURAS.
+
+Uno o varios PDF.
+
+No forman parte de XML/SRI.
+
+Botón:
+
+PDF = RIDE
+
+PDF COMPLETO = RIDE + SOPORTES
+
+XML separado.
+
+Preservar históricamente.
+
+En recurrentes:
+
+NO copiar soporte automáticamente.
+
+==================================================
+AA. RIDE
+==================================================
+
+Representación exacta del comprobante autorizado.
+
+Preservarlo.
+
+NO regenerar un RIDE histórico diferente cada vez que se consulta.
+
+Cabecera:
+
+- logo
+- empresa
+- nombre comercial
+- dirección matriz
+- establecimiento
+- obligaciones correspondientes
+
+Datos comprobante:
+
+- tipo
+- RUC
+- número
+- autorización
+- fecha autorización
+- ambiente
+- emisión
+- clave acceso
+- código de barras
+
+Luego:
+
+- comprador
+- detalle
+- información adicional
+- formas pago
+- totales
+
+Multipágina:
+
+primera página cabecera completa.
+
+Siguientes:
+
+cabecera reducida + número + página X/Y.
+
+Totales después del último detalle.
+
+==================================================
+AB. EMAIL
+==================================================
+
+Remitente inicial:
+
+aaaveliz@hotmail.com
+
+NO hardcodear contraseña.
+
+Cliente recibe:
+
+PDF + XML.
+
+Si soporte:
+
+PDF combinado.
+
+Si no hay email:
+
+autorizar igualmente.
+
+Error email:
+
+NO cambia estado SRI.
+
+Registrar error.
+
+Permitir:
+
+REENVIAR AL CLIENTE.
+
+Guardar logs:
+
+- fecha/hora
+- destinatario
+- usuario
+- resultado
+
+==================================================
+AC. ANULACIÓN
+==================================================
+
+QuickFact NO anula automáticamente ante SRI.
+
+Usuario realiza proceso correspondiente en SRI.
+
+Después puede marcar:
+
+ANULADO
+
+en QuickFact.
+
+No eliminar documento.
+
+No devolver consumo.
+
+Permiso de anulación configurable para usuarios adicionales.
+
+==================================================
+AD. REACTIVACIÓN INTERNA
+==================================================
+
+Documento anulado:
+
+SOLICITAR ACTIVAR COMPROBANTE.
+
+Motivo obligatorio.
+
+Owner:
+
+ACTIVAR
+RECHAZAR
+
+Solo estado interno.
+
+NO modificar estado SRI automáticamente.
+
+Auditar.
+
+NO crear alerta normal de usuario por esta solicitud.
+
+==================================================
+AE. RETENCIONES RECIBIDAS
+==================================================
+
+Entrada:
+
+SOLO XML.
+
+Extraer:
+
+- emisor
+- RUC
+- número
+- autorización
+- fecha
+- factura(s)
+- Ret Fte
+- Ret IVA
+- total
+
+Una retención:
+
+puede relacionarse con múltiples facturas.
+
+Una factura:
+
+máximo una retención vigente relacionada.
+
+Duplicado exacto vigente:
+
+NO duplicar.
+
+Si anterior está ANULADA y se carga nuevamente:
+
+crear NUEVO registro.
+
+Sin factura encontrada:
+
+SIN RELACIONAR.
+
+Permitir relación manual.
+
+Puede relacionarse con factura histórica anterior a QuickFact.
+
+NO consume.
+
+Estados:
+
+RELACIONADA
+SIN RELACIONAR
+ANULADA
+
+NO crear alerta por SIN RELACIONAR.
+
+==================================================
+AF. REPORTES
+==================================================
+
+REPORTES:
+
+1. Ventas
+2. Ventas por cliente
+3. Ventas por detalle
+4. Comparación períodos
+5. Retenciones recibidas
+6. Documentos
+7. Consumo
+
+Períodos:
+
+SEMANAL
+MENSUAL
+ANUAL
+PERSONALIZADO
+
+Semanal:
+
+lunes-domingo.
+
+Mensual:
+
+inicio-fin mes.
+
+Anual:
+
+01 enero-31 diciembre.
+
+Exportar:
+
+Excel
+PDF.
+
+Registrar descarga en auditoría.
+
+VENTAS:
+
+NUMERO
+CLIENTE
+DETALLE
+BASE ANTES DE IMPUESTOS
+IVA
+TOTAL
+Ret Fte
+Ret IVA
+TOTAL A COBRAR
+
+DETALLE completo.
+
+VENTAS POR CLIENTE:
+
+Identificación
+Cliente
+Facturas
+Base
+IVA
+Total
+
+VENTAS POR DETALLE:
+
+Detalle
+Cantidad documentos
+Base
+IVA
+Total
+
+Tomar detalle directamente de líneas de factura.
+
+Incluir conceptos manuales.
+
+COMPARACIÓN:
+
+períodos equivalentes.
+
+Indicadores:
+
+- total facturado
+- base
+- IVA
+- facturas
+- NC/ND
+- retenciones
+- total a cobrar
+
+DOCUMENTOS:
+
+histórico general con filtros.
+
+CONSUMO:
+
+- período
+- asignado
+- usado
+- disponible
+- ledger
+
+==================================================
+AG. PROGRAMADOS / RECURRENTES
+==================================================
+
+Permitir:
+
+UNA EMISIÓN FUTURA
+
+y
+
+RECURRENTE.
+
+Frecuencias:
+
+- semanal
+- mensual
+- anual
+- personalizada
+
+Duración:
+
+1-12 meses.
+
+NO reservar secuencia anticipadamente.
+
+NO consumir anticipadamente.
+
+Al ejecutar:
+
+validar:
+
+- período
+- consumo
+- firma
+- datos
+- punto activo
+- establecimiento
+
+Usar precio vigente del catálogo.
+
+Cada ocurrencia independiente.
+
+Soporte:
+
+NO copiar automáticamente.
+
+==================================================
+AH. ERROR PROGRAMADOS
+==================================================
+
+Sin disponibilidad:
+
+NO enviar SRI.
+
+Estado:
+
+PAUSADA — SIN COMPROBANTES DISPONIBLES.
+
+Enviar correo al ADMINISTRADOR.
+
+Owner asigna más.
+
+Admin puede reanudar.
+
+Otros errores:
+
+- registrar
+- notificar admin
+- pausar para evitar repetición incorrecta
+
+==================================================
+AI. DASHBOARD
+==================================================
+
+Inicio:
+
+- resumen ventas
+- consumo
+- últimos documentos
+- próximos programados
+- alertas
+- estado firma
+
+Gráfico:
+
+VENTAS POR SEMANA / MES.
+
+NO gráfico diario.
+
+NO resumen de retenciones.
+
+Botón:
+
+EMITIR FACTURA DE VENTA.
+
+Visible según permiso.
+
+Si consumo 0:
+
+puede seguir visible pero emisión debe bloquearse correctamente.
+
+==================================================
+AJ. ALERTAS
+==================================================
+
+Crear:
+
+- comprobante rechazado
+- error importante emisión
+- firma próxima a vencer
+- error correo cliente
+
+NO crear:
+
+- retención sin relación
+- solicitud activación
+- vencimiento período anual
+
+Firma próxima a vencer:
+
+visible especialmente en ADMIN QUICKFACT del Owner.
+
+==================================================
+AK. AUDITORÍA
+==================================================
+
+Auditar acciones importantes:
+
+- usuarios
+- permisos
+- certificados
+- establecimientos
+- puntos
+- configuración
+- emisión
+- rechazo
+- reintento
+- anulación
+- reactivación
+- stock
+- límites
+- reportes
+- correos
+
+Registrar cuando corresponda:
+
+- usuario
+- empresa
+- acción
+- documento
+- timestamp
+- valor anterior
+- valor nuevo
+- motivo
+
+No registrar cada clic.
+
+==================================================
+AL. SEGURIDAD
+==================================================
+
+OBLIGATORIO:
+
+- aislamiento multi-tenant backend
+- autorización backend
+- permisos backend
+- validación input
+- hashes seguros
+- secretos cifrados/protegidos
+- protección certificados
+- auditoría
+- rate limiting donde corresponda
+- CORS correctamente configurado
+- headers seguridad
+- manejo seguro de errores
+- validación de archivos
+- tamaño máximo uploads
+
+Nunca GitHub:
+
+.env
+.p12
+.pem
+.key
+passwords
+tokens
+DATABASE_URL real
+SMTP password
+secretos
+credenciales SRI
+
+Crear:
+
+.env.example
+
+SIN secretos reales.
+
+==================================================
+AM. BASE DE DATOS
+==================================================
+
+Ya puede existir schema Prisma.
+
+NO lo reemplaces automáticamente.
+
+AUDÍTALO.
+
+Debe contemplar como mínimo, según necesidad:
+
+- Company
+- User
+- Role
+- Permission
+- RolePermission
+- UserPermission
+- AnnualPeriod
+- DocumentLimit
+- ConsumptionLedger
+- Establishment
+- EmissionPoint
+- Certificate
+- Product
+- Stock
+- StockMovement
+- Customer
+- Document
+- DocumentDetail
+- Payment
+- AdditionalInformation
+- DocumentSupport
+- Authorization
+- RetentionReceived
+- RetentionRelation
+- ScheduledDocument
+- AuditLog
+- EmailLog
+
+Si ya existen:
+
+REVISA relaciones, índices, unique constraints y companyId.
+
+NO dupliques modelos.
+
+Revisar especialmente:
+
+- multi-tenancy
+- concurrencia de secuencias
+- consumo idempotente
+- documentos
+- permisos
+- relaciones de retenciones
+- auditoría
+
+==================================================
+AN. GITHUB
+==================================================
+
+El proyecto debe quedar correctamente versionado.
+
+Verificar:
+
+.gitignore
+README
+.env.example
+
+NO secretos.
+
+Antes de push:
+
+- build
+- typecheck
+- lint
+- tests
+- git status
+- revisar secretos
+
+Usar commits descriptivos.
+
+NO force push salvo necesidad justificada.
+
+NO destruir historial.
+
+==================================================
+AO. RENDER
+==================================================
+
+BACKEND se desplegará en Render.
+
+Preparar:
+
+- Web Service
+- build command
+- start command
+- variables entorno
+- health check
+- logs
+- conexión PostgreSQL
+- migraciones producción
+
+PostgreSQL:
+
+preferentemente administrado.
+
+DATABASE_URL:
+
+solo variable entorno.
+
+Nunca frontend.
+
+Preparar jobs/cron para programados cuando corresponda.
+
+NO ejecutar tareas críticas dependiendo del navegador del cliente.
+
+==================================================
+AP. VERCEL
+==================================================
+
+FRONTEND se desplegará en Vercel.
+
+Preparar:
+
+- build
+- variables entorno
+- URL backend
+- preview
+- production
+
+No exponer secretos backend mediante:
+
+NEXT_PUBLIC_*
+
+Solo variables realmente públicas pueden utilizar prefijo público.
+
+==================================================
+AQ. ARCHIVOS
+==================================================
+
+NO guardar permanentemente:
+
+- XML
+- RIDE
+- soportes
+- certificados
+
+en el filesystem efímero de Render.
+
+Diseñar almacenamiento persistente/objeto adecuado.
+
+Separar especialmente:
+
+CERTIFICADOS PRIVADOS
+
+de
+
+DOCUMENTOS DE CLIENTE.
+
+Controlar acceso mediante backend.
+
+No hacer públicos certificados.
+
+==================================================
+AR. SRI — REGLA CRÍTICA
+==================================================
+
+NO INVENTAR INFORMACIÓN DEL SRI.
+
+Antes de integración real:
+
+verificar documentación oficial vigente del SRI Ecuador.
+
+Verificar:
+
+- XSD
+- versiones
+- XML
+- endpoints
+- ambientes
+- firma
+- clave acceso
+- recepción
+- autorización
+- estados
+- NC
+- ND
+- guía
+- numeración/reintentos
+- RIDE
+
+Si no tienes acceso fiable a documentación actual:
+
+NO improvises.
+
+Implementa interfaces/adaptadores/mocks si hace falta y deja claramente identificado el punto pendiente.
+
+Nunca uses certificados reales para pruebas automatizadas del repositorio.
+
+==================================================
+AS. ESTADOS
+==================================================
+
+Los estados deben estar controlados por backend.
+
+Ejemplos documentos:
+
+BORRADOR
+PROCESANDO
+AUTORIZADO
+RECHAZADO
+ANULADO
+
+Programados:
+
+ACTIVO
+PAUSADO
+PAUSADO_SIN_DOCUMENTOS
+PAUSADO_ERROR
+CANCELADO
+COMPLETADO
+
+No permitir que frontend envíe cualquier estado arbitrario y backend simplemente lo acepte.
+
+==================================================
+AT. FASES DE DESARROLLO
+==================================================
+
+Usa el código existente y determina cuál fase está realmente alcanzada.
+
+Orden objetivo:
+
+FASE 1
+Auditoría repositorio
+
+FASE 2
+Arquitectura
+
+FASE 3
+Git/GitHub
+
+FASE 4
+Modelo de datos
+
+FASE 5
+Proyecto base
+
+FASE 6
+Autenticación
+
+FASE 7
+Empresas + usuarios + permisos
+
+FASE 8
+Configuración empresa
+
+FASE 9
+Productos + clientes + stock
+
+FASE 10
+Facturación base
+
+FASE 11
+Integración SRI + firma
+
+FASE 12
+XML + RIDE + correo
+
+FASE 13
+NC + ND + guías
+
+FASE 14
+Retenciones recibidas
+
+FASE 15
+Reportería
+
+FASE 16
+Programados/recurrentes
+
+FASE 17
+ADMIN QUICKFACT
+
+FASE 18
+Auditoría + hardening seguridad
+
+FASE 19
+Pruebas integrales
+
+FASE 20
+Deploy
+
+GitHub
+↓
+Render/PostgreSQL
+↓
+Vercel
+↓
+pruebas producción
+
+==================================================
+AU. FORMA DE TRABAJAR CONMIGO
+==================================================
+
+Soy el propietario del proyecto pero no asumas que soy desarrollador profesional.
+
+Cuando necesites que yo haga algo manual:
+
+DAME INSTRUCCIONES CONCRETAS.
+
+Ejemplo:
+
+1. Abre Render.
+2. Pulsa New.
+3. Selecciona PostgreSQL.
+4. Copia X.
+5. NO compartas públicamente Y.
+
+No me des diez pasos vagos simultáneamente.
+
+Si puedes hacer una operación de forma segura desde el entorno/repo, hazla.
+
+Si requiere:
+
+- autorización
+- contraseña
+- cuenta externa
+- pago
+- secreto
+- decisión funcional importante
+
+DETENTE y pídeme la acción necesaria.
+
+No me pidas secretos si pueden configurarse directamente como variables de entorno.
+
+==================================================
+AV. NO HACER
+==================================================
+
+NO:
+
+- empezar QuickFact desde cero
+- borrar el código actual
+- rediseñar todo sin necesidad
+- cambiar stack porque sí
+- inventar requisitos
+- añadir funciones no solicitadas
+- implementar SRI con información inventada
+- guardar secretos en repo
+- confiar en frontend para seguridad
+- usar filesystem efímero como almacenamiento permanente
+- hacer deploy roto
+- hacer cambios masivos sin probar
+- crear una app monousuario
+- olvidar companyId
+- permitir acceso entre empresas
+- consumir dos veces por el mismo documento
+- permitir secuencias duplicadas por concurrencia
+
+==================================================
+AW. PRIMERA INSTRUCCIÓN PARA ESTA SESIÓN
+==================================================
+
+AHORA:
+
+1. INSPECCIONA EL REPOSITORIO COMPLETO.
+
+2. NO empieces de cero.
+
+3. Dime qué existe realmente.
+
+4. Identifica la fase real del proyecto.
+
+5. Revisa especialmente:
+
+   - frontend
+   - backend
+   - Prisma
+   - autenticación
+   - multi-tenancy
+   - seguridad
+   - .gitignore
+   - variables entorno
+   - Git
+   - configuración Render
+   - configuración Vercel
+
+6. Ejecuta las comprobaciones locales que sean posibles:
+
+   - instalación dependencias si hace falta
+   - Prisma validate
+   - build backend
+   - build frontend
+   - typecheck
+   - lint
+   - tests existentes
+
+7. Corrige únicamente errores básicos que impidan trabajar con el proyecto, sin adelantar fases completas.
+
+8. NO implementes todavía SRI real.
+
+9. NO hagas deploy de producción todavía.
+
+10. NO borres funcionalidades existentes.
+
+11. Entrégame un informe breve con:
+
+ESTADO ACTUAL
+QUÉ FUNCIONA
+QUÉ FALTA
+PROBLEMAS ENCONTRADOS
+CORRECCIONES REALIZADAS
+SIGUIENTE FASE RECOMENDADA
+
+12. Después continúa con la siguiente fase lógica SOLO si no requiere una decisión funcional importante ni credenciales/autorizaciones externas.
+
+Si necesitas que yo haga algo en GitHub, Render o Vercel, detente exactamente en ese punto y dime qué debo hacer.
+
+==================================================
+AX. OBJETIVO FINAL
+==================================================
+
+El objetivo no es solamente que QuickFact "se vea".
+
+Debe terminar siendo:
+
+- funcional
+- seguro
+- multiempresa
+- auditable
+- desplegable
+- mantenible
+- conectado correctamente a PostgreSQL
+- backend operativo en Render
+- frontend operativo en Vercel
+- repositorio limpio en GitHub
+- preparado para integración real con SRI Ecuador
+
+La prioridad es CORRECTITUD antes que velocidad.
+
+Continúa desde el código que ya existe.

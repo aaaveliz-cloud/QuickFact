@@ -1,0 +1,17 @@
+{
+  "name": "quickfact",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@11.19.0",
+  "engines": { "node": ">=24 <25" },
+  "scripts": {
+    "dev:web": "pnpm --filter @quickfact/web dev",
+    "dev:api": "pnpm --filter @quickfact/api dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm --filter @quickfact/api test",
+    "db:validate": "pnpm --filter @quickfact/api db:validate",
+    "db:migrate": "pnpm --filter @quickfact/api db:migrate"
+  }
+}
