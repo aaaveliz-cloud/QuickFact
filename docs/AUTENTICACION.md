@@ -45,6 +45,8 @@ Después de migrar una base de desarrollo, preparar privadamente `MIGRATION_DATA
 
 21 pruebas locales de HTTP, autenticación y lectura de firmas aprobadas después del ajuste de proxy. GitHub Actions crea PostgreSQL 16 temporal, aplica la migración y ejecuta `test:db` con dos empresas y un Owner. Comprueba RLS, recuperación de contexto del pool, rechazos de escritura cruzada, restricciones de datos, sesiones, cambios de rol y acceso global autorizado. El job no despliega ni requiere secretos de producción.
 
-Las pruebas de base exigen `TEST_DATABASE_URL` con nombre `quickfact_test` en loopback y un entorno desechable, como el servicio CI. No se ejecutan contra una base real de clientes. No confundir una prueba HTTP con verificación de políticas PostgreSQL; consultar el resultado del job en GitHub antes de considerar validada la migración.
+Las pruebas de base exigen `TEST_DATABASE_URL` con nombre `quickfact_test` en loopback y un entorno desechable, como el servicio CI. No se ejecutan contra una base real de clientes. No confundir una prueba HTTP con verificación de políticas PostgreSQL.
+
+Resultado real: [job aprobado del commit 92204d2](https://github.com/aaaveliz-cloud/QuickFact/actions/runs/36746586871). La migración se aplicó y las siete subpruebas de integración PostgreSQL 16 pasaron. La base de desarrollo de Render y el Owner real siguen pendientes; tampoco se ha verificado todavía el proxy/cookie en un despliegue Vercel–Render con navegador.
 
 Referencias: [OWASP Password Storage](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html), [Node.js crypto](https://nodejs.org/docs/latest-v24.x/api/crypto.html), [Prisma PostgreSQL](https://www.prisma.io/docs/orm/v7/core-concepts/supported-databases/postgresql), [Next.js rewrites](https://nextjs.org/docs/app/api-reference/config/next-config-js/rewrites).

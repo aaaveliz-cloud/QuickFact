@@ -1,6 +1,8 @@
 # Verificación de la base inicial
 
-Este archivo conserva los resultados históricos del 29/09/2026. La fase del 30/09/2026 se describe en `AUTENTICACION.md`: sus 21 pruebas locales, compilación, tipos, lint y validación Prisma están aprobados. La ejecución de la migración y pruebas PostgreSQL se comprobará mediante el job de GitHub antes de conectar Render.
+Este archivo conserva los resultados históricos del 29/09/2026. La fase del 30/09/2026 se describe en `AUTENTICACION.md`: sus 21 pruebas locales, compilación, tipos, lint y validación Prisma están aprobados.
+
+La [verificación en GitHub Actions](https://github.com/aaaveliz-cloud/QuickFact/actions/runs/36746586871) terminó con éxito para el commit `92204d2`. Instalación reproducible, compilación, tipos, lint, 21 pruebas, migración inicial y siete subpruebas de integración PostgreSQL 16 aprobadas. Las pruebas reales comprobaron RLS, contexto de transacción, restricciones de datos, login y sesiones, rechazo entre empresas, invalidación por cambio de rol y acceso del Owner. Auditoría de dependencias de producción sin vulnerabilidades conocidas reportadas. No se creó ni conectó una base real en Render.
 
 Resultados locales de la sesión del 29 de septiembre de 2026 (America/Guayaquil):
 
