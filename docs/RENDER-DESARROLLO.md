@@ -6,4 +6,6 @@ El workflow `render-dev-database.yml` instala dependencias y aplica únicamente 
 
 La finalización del workflow debe comprobarse en GitHub Actions antes de afirmar que la base está migrada. Después faltan el rol runtime limitado, el Owner inicial y la conexión de la API. La conexión administrativa no debe usarse como `DATABASE_URL` del servidor.
 
+Resultado confirmado: [ejecución aprobada del commit 8808f2f](https://github.com/aaaveliz-cloud/QuickFact/actions/runs/36753052943). La conexión externa usó TLS con validación de certificado; se aplicó la migración y se verificaron las cuatro tablas con RLS forzada y las dos funciones SECURITY DEFINER. No se creó aún ningún Owner ni rol runtime.
+
 El primer intento real reveló que el administrador gestionado no puede declarar `SET quickfact.is_owner` en la definición de una función. Las funciones de identidad ahora cambian ese contexto local durante su ejecución y restauran el anterior tanto en éxito como en error. CI aplica la migración con un rol sin superusuario para comprobar esta restricción. La migración inicial fallida se puede marcar como revertida únicamente si se reconoce ese error y no existen tablas, tipo de roles ni funciones de QuickFact; no se eliminan datos ni se realiza un reset.

@@ -15,11 +15,11 @@ Estructura del monorepositorio, página de preparación, API sin endpoints de ne
 
 ## Siguiente etapa
 
-1. Crear PostgreSQL de desarrollo en Render, configurar rol runtime limitado separado del administrador y crear el Owner por bootstrap privado.
+1. Configurar el rol runtime limitado separado del administrador y crear el Owner por bootstrap privado en la base de desarrollo de Render ya creada y migrada.
 2. Verificar login/sesiones contra esa base y construir la interfaz de acceso.
 3. Continuar gestión de empresas, usuarios, permisos y auditoría; después configuración y firma.
 
-Ya preparados: migración de identidad/períodos/sesiones, RLS en cuatro tablas, conexión PostgreSQL, readiness, login/logout/me y consulta de perfil de empresa con autorización backend. El [job CI](https://github.com/aaaveliz-cloud/QuickFact/actions/runs/36746586871) acreditó la migración y las pruebas reales de aislamiento en PostgreSQL. La base de Render aún no está conectada.
+Ya preparados: migración de identidad/períodos/sesiones, RLS en cuatro tablas, conexión PostgreSQL, readiness, login/logout/me y consulta de perfil de empresa con autorización backend. El [job CI](https://github.com/aaaveliz-cloud/QuickFact/actions/runs/36746586871) acreditó la migración y las pruebas reales de aislamiento en PostgreSQL. La [base de desarrollo de Render ya está migrada](https://github.com/aaaveliz-cloud/QuickFact/actions/runs/36753052943); aún no hay una API desplegada usando su rol runtime.
 
 No presentar el esquema preliminar como garantía de aislamiento. La seguridad debe comprobarse en backend y base de datos con pruebas reales.
 

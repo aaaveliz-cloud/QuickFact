@@ -1,6 +1,6 @@
 # Autenticación y base multiempresa
 
-Implementación backend inicial. Requiere PostgreSQL migrado y un rol runtime limitado; no se ha conectado Render ni creado un Owner real. No incluye aún interfaz de login, permisos granulares ni gestión de usuarios.
+Implementación backend inicial. La base de desarrollo de Render ya está migrada; faltan el rol runtime limitado y el Owner real. No incluye aún interfaz de login, permisos granulares ni gestión de usuarios.
 
 ## Endpoints
 
@@ -47,6 +47,6 @@ Después de migrar una base de desarrollo, preparar privadamente `MIGRATION_DATA
 
 Las pruebas de base exigen `TEST_DATABASE_URL` con nombre `quickfact_test` en loopback y un entorno desechable, como el servicio CI. No se ejecutan contra una base real de clientes. No confundir una prueba HTTP con verificación de políticas PostgreSQL.
 
-Resultado real: [job aprobado del commit 92204d2](https://github.com/aaaveliz-cloud/QuickFact/actions/runs/36746586871). La migración se aplicó y las siete subpruebas de integración PostgreSQL 16 pasaron. La base de desarrollo de Render y el Owner real siguen pendientes; tampoco se ha verificado todavía el proxy/cookie en un despliegue Vercel–Render con navegador.
+Resultado inicial: [job aprobado del commit 92204d2](https://github.com/aaaveliz-cloud/QuickFact/actions/runs/36746586871). La migración se aplicó y las siete subpruebas de integración PostgreSQL 16 pasaron. Después, [la migración de Render del commit 8808f2f](https://github.com/aaaveliz-cloud/QuickFact/actions/runs/36753052943) verificó conexión TLS, cuatro tablas con RLS forzada y dos funciones de identidad. Las funciones restauran explícitamente el contexto Owner tanto en éxito como en error para admitir administradores sin superusuario. Faltan el rol runtime y el Owner real; tampoco se ha verificado todavía el proxy/cookie en un despliegue Vercel–Render con navegador.
 
 Referencias: [OWASP Password Storage](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html), [Node.js crypto](https://nodejs.org/docs/latest-v24.x/api/crypto.html), [Prisma PostgreSQL](https://www.prisma.io/docs/orm/v7/core-concepts/supported-databases/postgresql), [Next.js rewrites](https://nextjs.org/docs/app/api-reference/config/next-config-js/rewrites).

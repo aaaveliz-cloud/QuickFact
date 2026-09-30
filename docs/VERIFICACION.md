@@ -1,5 +1,7 @@
 # Verificación de la base inicial
 
+Actualización de Render: [migración real aprobada](https://github.com/aaaveliz-cloud/QuickFact/actions/runs/36753052943) y [CI completo aprobado](https://github.com/aaaveliz-cloud/QuickFact/actions/runs/36753053137) para `8808f2f`. Cuatro tablas con RLS forzada y dos funciones de identidad verificadas en la base Free de desarrollo. CI ahora migra con un rol sin superusuario y vuelve a comprobar login, sesiones y recuperación de contexto. No se crearon el Owner real ni el rol runtime de Render.
+
 Este archivo conserva los resultados históricos del 29/09/2026. La fase del 30/09/2026 se describe en `AUTENTICACION.md`: sus 21 pruebas locales, compilación, tipos, lint y validación Prisma están aprobados.
 
 La [verificación en GitHub Actions](https://github.com/aaaveliz-cloud/QuickFact/actions/runs/36746586871) terminó con éxito para el commit `92204d2`. Instalación reproducible, compilación, tipos, lint, 21 pruebas, migración inicial y siete subpruebas de integración PostgreSQL 16 aprobadas. Las pruebas reales comprobaron RLS, contexto de transacción, restricciones de datos, login y sesiones, rechazo entre empresas, invalidación por cambio de rol y acceso del Owner. Auditoría de dependencias de producción sin vulnerabilidades conocidas reportadas. No se creó ni conectó una base real en Render.

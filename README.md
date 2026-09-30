@@ -8,7 +8,7 @@ Repositorio: https://github.com/aaaveliz-cloud/QuickFact. Se conservan también 
 
 ## Estado real
 
-Frontend Next.js y API Express con login por username/contraseña, sesiones revocables y consulta autorizada de perfil de empresa. La migración inicial añade identidad, períodos, sesiones, restricciones y RLS forzada. Incluye un lector backend de metadatos `.p12` RSA probado con certificados sintéticos; aún no tiene ruta HTTP ni almacenamiento. No hay interfaz de login, permisos granulares, emisión, conexión SRI ni despliegue. PostgreSQL de Render sigue pendiente. Consultar `docs/AUTENTICACION.md` y el resultado de CI para distinguir implementación y validación real.
+Frontend Next.js y API Express con login por username/contraseña, sesiones revocables y consulta autorizada de perfil de empresa. La migración inicial añade identidad, períodos, sesiones, restricciones y RLS forzada. Incluye un lector backend de metadatos `.p12` RSA probado con certificados sintéticos; aún no tiene ruta HTTP ni almacenamiento. No hay interfaz de login, permisos granulares, emisión, conexión SRI ni despliegue. PostgreSQL de desarrollo de Render ya está migrado; faltan el rol runtime y el Owner inicial. Consultar `docs/AUTENTICACION.md` y el resultado de CI para distinguir implementación y validación real.
 
 QuickFact será una aplicación web alojada en la nube, accesible desde navegador. Los comandos siguientes son para desarrollo; los clientes no instalan ningún programa.
 
@@ -39,7 +39,7 @@ pnpm test
 
 ## Próxima fase
 
-Crear PostgreSQL de desarrollo en Render, aplicar y verificar la migración, configurar rol runtime separado y crear Owner mediante bootstrap privado. Luego implementar interfaz de login, gestión de empresas/usuarios y permisos. No aplicar migraciones a producción desde una máquina de desarrollo.
+Configurar rol runtime separado y crear Owner mediante bootstrap privado en la base de desarrollo de Render, ya migrada y verificada. Luego implementar interfaz de login, gestión de empresas/usuarios y permisos. No aplicar migraciones a producción desde una máquina de desarrollo.
 
 ## GitHub, Vercel y Render
 
