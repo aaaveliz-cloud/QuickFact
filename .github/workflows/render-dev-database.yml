@@ -1,5 +1,5 @@
 name: QuickFact Render development database
-# Administrative diagnostics contain codes and fixed hints, never raw errors.
+# Administrative diagnostics contain codes, fixed hints and schema counts only.
 
 on:
   push:
