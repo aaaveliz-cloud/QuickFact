@@ -176,18 +176,32 @@ CREATE POLICY session_scope ON "Session" USING (
 -- Narrow platform identity lookups for login/session resolution. Function-local
 -- GUCs restore automatically at exit; no arbitrary SQL or table name parameters.
 CREATE FUNCTION public.quickfact_login_user(p_username text) RETURNS SETOF public."User"
-LANGUAGE sql SECURITY DEFINER SET search_path = pg_catalog, public
-SET "quickfact.is_owner" = 'true' AS $$
-  SELECT * FROM public."User" WHERE "username" = p_username;
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, public AS $$
+DECLARE previous_owner text := current_setting('quickfact.is_owner', true);
+BEGIN
+  PERFORM set_config('quickfact.is_owner', 'true', true);
+  RETURN QUERY SELECT * FROM public."User" WHERE "username" = p_username;
+  PERFORM set_config('quickfact.is_owner', coalesce(previous_owner, ''), true);
+EXCEPTION WHEN OTHERS THEN
+  PERFORM set_config('quickfact.is_owner', coalesce(previous_owner, ''), true);
+  RAISE;
+END;
 $$;
 CREATE FUNCTION public.quickfact_session(p_token_hash text)
 RETURNS TABLE ("tokenHash" text, "userId" uuid, "authVersion" integer,
   "expiresAt" timestamp(3), "userData" jsonb)
-LANGUAGE sql SECURITY DEFINER SET search_path = pg_catalog, public
-SET "quickfact.is_owner" = 'true' AS $$
-  SELECT s."tokenHash"::text, s."userId", s."authVersion", s."expiresAt", to_jsonb(u)
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, public AS $$
+DECLARE previous_owner text := current_setting('quickfact.is_owner', true);
+BEGIN
+  PERFORM set_config('quickfact.is_owner', 'true', true);
+  RETURN QUERY SELECT s."tokenHash"::text, s."userId", s."authVersion", s."expiresAt", to_jsonb(u)
   FROM public."Session" s JOIN public."User" u ON u."id" = s."userId"
   WHERE s."tokenHash" = p_token_hash;
+  PERFORM set_config('quickfact.is_owner', coalesce(previous_owner, ''), true);
+EXCEPTION WHEN OTHERS THEN
+  PERFORM set_config('quickfact.is_owner', coalesce(previous_owner, ''), true);
+  RAISE;
+END;
 $$;
 REVOKE ALL ON FUNCTION public.quickfact_login_user(text) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.quickfact_session(text) FROM PUBLIC;

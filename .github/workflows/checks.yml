@@ -41,6 +41,9 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm test
+      - run: node apps/api/scripts/prepare-ci-migration-role.mjs
       - run: pnpm --filter @quickfact/api db:deploy
+        env:
+          MIGRATION_DATABASE_URL: postgresql://quickfact_test_migrator:ephemeral-migration-test-only@localhost:5432/quickfact_test
       - run: pnpm --filter @quickfact/api test:db
       - run: pnpm audit --prod

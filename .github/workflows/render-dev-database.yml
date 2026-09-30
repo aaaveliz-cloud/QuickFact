@@ -1,5 +1,5 @@
 name: QuickFact Render development database
-# Administrative diagnostics contain codes, fixed hints and parameter identifiers.
+# Initial migration supports managed administrators without superuser privileges.
 
 on:
   push:

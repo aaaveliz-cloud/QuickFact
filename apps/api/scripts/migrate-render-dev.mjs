@@ -21,8 +21,10 @@ try {
   client = new pg.Client({ connectionString: connection.href, connectionTimeoutMillis: 15000 });
   await client.connect();
   console.log('Authorized Render development database connected over verified TLS.');
+  let failedRecords = [];
   if ((await client.query("SELECT to_regclass('public._prisma_migrations') IS NOT NULL AS present")).rows[0].present) {
-    const failed = await client.query('SELECT logs FROM public._prisma_migrations WHERE finished_at IS NULL AND rolled_back_at IS NULL');
+    const failed = await client.query('SELECT migration_name, logs FROM public._prisma_migrations WHERE finished_at IS NULL AND rolled_back_at IS NULL');
+    failedRecords = failed.rows;
     for (const record of failed.rows) {
       const log = record.logs ?? '';
       const codes = [...new Set(log.match(/\bP\d{4}\b|\bE[0-9A-Z]{5}\b/g) ?? [])];
@@ -34,6 +36,23 @@ try {
   }
   const tables = await client.query("SELECT count(*)::int AS count FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname IN ('Company','User','AnnualPeriod','Session')");
   console.log(`Existing application tables: ${tables.rows[0].count}.`);
+  if (failedRecords.length) {
+    const objects = await client.query(`SELECT
+      to_regtype('public."UserRole"') IS NOT NULL AS has_type,
+      EXISTS(SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
+        WHERE n.nspname='public' AND p.proname LIKE 'quickfact_%') AS has_functions`);
+    const safeRecovery = failedRecords.length === 1
+      && failedRecords[0].migration_name === '202609300001_initial_identity'
+      && failedRecords[0].logs?.includes('permission denied to set parameter "quickfact.is_owner"')
+      && tables.rows[0].count === 0 && !objects.rows[0].has_type && !objects.rows[0].has_functions;
+    if (!safeRecovery) throw new Error('RECOVERY_REQUIRES_REVIEW');
+    const resolved = spawnSync('pnpm', ['exec', 'prisma', 'migrate', 'resolve', '--rolled-back', '202609300001_initial_identity'], {
+      env: { ...process.env, MIGRATION_DATABASE_URL: connection.href },
+      encoding: 'utf8', timeout: 60000, maxBuffer: 1024 * 1024,
+    });
+    if (resolved.status !== 0) throw new Error('RECOVERY_REQUIRES_REVIEW');
+    console.log('Known failed initial migration marked rolled back after confirming no application objects exist.');
+  }
   const migration = spawnSync('pnpm', ['exec', 'prisma', 'migrate', 'deploy'], {
     env: { ...process.env, MIGRATION_DATABASE_URL: connection.href },
     encoding: 'utf8', timeout: 180000, maxBuffer: 1024 * 1024,
@@ -61,7 +80,7 @@ try {
   if (identity.rows[0].count !== 2) throw new Error('IDENTITY_CHECK_FAILED');
   console.log('Migration applied: four tables with forced RLS and two identity functions verified.');
 } catch (error) {
-  const safeCodes = new Set(['INVALID_TARGET', 'MIGRATION_FAILED', 'SCHEMA_CHECK_FAILED', 'IDENTITY_CHECK_FAILED']);
+  const safeCodes = new Set(['INVALID_TARGET', 'MIGRATION_FAILED', 'SCHEMA_CHECK_FAILED', 'IDENTITY_CHECK_FAILED', 'RECOVERY_REQUIRES_REVIEW']);
   const code = safeCodes.has(error?.message) ? error.message : 'CONNECTION_OR_VERIFICATION_FAILED';
   console.error(`Development database setup failed: ${code}. No credentials or raw database output were logged.`);
   process.exitCode = 1;
