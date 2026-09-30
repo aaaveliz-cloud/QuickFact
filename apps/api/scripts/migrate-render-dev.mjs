@@ -25,7 +25,13 @@ try {
     env: { ...process.env, MIGRATION_DATABASE_URL: connection.href },
     encoding: 'utf8', timeout: 180000, maxBuffer: 1024 * 1024,
   });
-  if (migration.status !== 0) throw new Error('MIGRATION_FAILED');
+  if (migration.status !== 0) {
+    const output = `${migration.stdout ?? ''}\n${migration.stderr ?? ''}`;
+    const prismaCodes = [...new Set(output.match(/\bP\d{4}\b/g) ?? [])];
+    const sqlCodes = [...output.matchAll(/(?:Database error code|SQLSTATE):\s*([A-Z0-9]{5})/g)].map(m => m[1]);
+    console.error(`Migration diagnostic codes: ${[...prismaCodes, ...sqlCodes].join(', ') || 'none'}; process status: ${migration.status ?? 'unavailable'}.`);
+    throw new Error('MIGRATION_FAILED');
+  }
   const result = await client.query(`
     SELECT count(*)::int AS count FROM pg_class c
     JOIN pg_namespace n ON n.oid = c.relnamespace
