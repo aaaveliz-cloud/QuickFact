@@ -15,11 +15,12 @@ Estructura del monorepositorio, página de preparación, API sin endpoints de ne
 
 ## Siguiente etapa
 
-1. Completar el esquema según los flujos y restricciones de la especificación.
-2. Configurar PostgreSQL de desarrollo independiente de producción.
-3. Generar y revisar la migración inicial: restricciones de rol/empresa, límites positivos y fechas válidas; claves compuestas para referencias entre entidades de una misma empresa.
-4. Implementar conexión y readiness de base de datos, autenticación, sesiones, autorización y permisos backend.
-5. Probar accesos cruzados entre dos empresas y las capacidades del Owner antes de exponer información.
+1. Verificar el job CI con PostgreSQL temporal y la migración inicial.
+2. Crear PostgreSQL de desarrollo en Render, configurar rol runtime limitado separado del administrador y crear el Owner por bootstrap privado.
+3. Verificar login/sesiones contra esa base y construir la interfaz de acceso.
+4. Continuar gestión de empresas, usuarios, permisos y auditoría; después configuración y firma.
+
+Ya preparados: migración de identidad/períodos/sesiones, RLS en cuatro tablas, conexión PostgreSQL, readiness, login/logout/me y consulta de perfil de empresa con autorización backend. El resultado de CI debe acreditar la ejecución real de migraciones y aislamiento en PostgreSQL; la base de Render aún no está conectada.
 
 No presentar el esquema preliminar como garantía de aislamiento. La seguridad debe comprobarse en backend y base de datos con pruebas reales.
 

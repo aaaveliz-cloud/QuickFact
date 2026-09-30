@@ -1,5 +1,7 @@
 # Verificación de la base inicial
 
+Este archivo conserva los resultados históricos del 29/09/2026. La fase del 30/09/2026 se describe en `AUTENTICACION.md`: sus 21 pruebas locales, compilación, tipos, lint y validación Prisma están aprobados. La ejecución de la migración y pruebas PostgreSQL se comprobará mediante el job de GitHub antes de conectar Render.
+
 Resultados locales de la sesión del 29 de septiembre de 2026 (America/Guayaquil):
 
 - Instalación de dependencias completada con pnpm 11.19.0; lockfile generado.

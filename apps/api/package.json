@@ -10,11 +10,14 @@
     "lint": "eslint src test",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test test/*.test.ts",
+    "test:db": "tsx --test test/integration/*.test.ts",
     "db:validate": "prisma validate",
     "db:migrate": "prisma migrate dev",
-    "db:deploy": "prisma migrate deploy"
+    "db:deploy": "prisma migrate deploy",
+    "db:bootstrap-owner": "node dist/scripts/bootstrap-owner.js"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "7.10.0",
     "@prisma/client": "^7.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.0.0",
@@ -22,6 +25,7 @@
     "express-rate-limit": "^8.0.0",
     "helmet": "^8.0.0",
     "node-forge": "^1.4.0",
+    "pg": "^8.23.0",
     "zod": "^4.0.0"
   },
   "devDependencies": {
@@ -29,6 +33,7 @@
     "@types/express": "^5.0.0",
     "@types/node": "^24.0.0",
     "@types/node-forge": "^1.3.14",
+    "@types/pg": "^8.23.1",
     "@types/supertest": "^6.0.0",
     "eslint": "^9.0.0",
     "prisma": "^7.0.0",

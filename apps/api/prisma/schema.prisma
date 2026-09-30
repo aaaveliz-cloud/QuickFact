@@ -35,11 +35,26 @@ model User {
   lastName     String
   role         UserRole
   active       Boolean   @default(true)
+  authVersion  Int       @default(1)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+  sessions     Session[]
 
   @@unique([companyId, id])
   @@index([companyId, active])
+}
+
+model Session {
+  id          String   @id @default(uuid()) @db.Uuid
+  tokenHash   String   @unique @db.Char(64)
+  userId      String   @db.Uuid
+  user        User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  authVersion Int
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model AnnualPeriod {

@@ -8,7 +8,7 @@ Repositorio: https://github.com/aaaveliz-cloud/QuickFact. Se conservan también 
 
 ## Estado real
 
-Base inicial: frontend Next.js, API Express con health check, TypeScript estricto y esquema Prisma preliminar (empresas, usuarios y períodos). Incluye un lector backend de metadatos `.p12` RSA probado con certificados sintéticos; aún no tiene ruta HTTP ni almacenamiento. No hay login, emisión, conexión SRI ni despliegue de producción. El esquema no garantiza todavía el aislamiento multiempresa: se completará con autorización backend, restricciones SQL y pruebas de acceso cruzado antes de exponer datos.
+Frontend Next.js y API Express con login por username/contraseña, sesiones revocables y consulta autorizada de perfil de empresa. La migración inicial añade identidad, períodos, sesiones, restricciones y RLS forzada. Incluye un lector backend de metadatos `.p12` RSA probado con certificados sintéticos; aún no tiene ruta HTTP ni almacenamiento. No hay interfaz de login, permisos granulares, emisión, conexión SRI ni despliegue. PostgreSQL de Render sigue pendiente. Consultar `docs/AUTENTICACION.md` y el resultado de CI para distinguir implementación y validación real.
 
 QuickFact será una aplicación web alojada en la nube, accesible desde navegador. Los comandos siguientes son para desarrollo; los clientes no instalan ningún programa.
 
@@ -23,9 +23,9 @@ pnpm dev:web
 pnpm dev:api
 ```
 
-Frontend: http://localhost:3000. API: http://localhost:4000/health. Este health check indica disponibilidad del proceso, no de PostgreSQL.
+Frontend: http://localhost:3000. API: http://localhost:4000/health. Este health check indica disponibilidad del proceso; `/ready` comprueba PostgreSQL, migración y rol limitado.
 
-Copiar `apps/api/.env.example` a `apps/api/.env` y `apps/web/.env.example` a `apps/web/.env.local` cuando se configuren servicios. Los ejemplos no contienen credenciales reales. PostgreSQL no es necesario para compilar esta primera base.
+Copiar `apps/api/.env.example` a `apps/api/.env` y `apps/web/.env.example` a `apps/web/.env.local` cuando se configuren servicios. Los ejemplos no contienen credenciales reales. Sin PostgreSQL se puede compilar y probar con almacenes simulados; la API informa autenticación no configurada y readiness 503.
 
 ## Verificación
 
@@ -39,12 +39,12 @@ pnpm test
 
 ## Próxima fase
 
-Completar modelo de datos, migración inicial con restricciones multiempresa, conexión PostgreSQL de desarrollo, autenticación por username/contraseña y permisos backend. No aplicar migraciones a producción desde una máquina de desarrollo. No hay migraciones todavía: el esquema es preliminar.
+Crear PostgreSQL de desarrollo en Render, aplicar y verificar la migración, configurar rol runtime separado y crear Owner mediante bootstrap privado. Luego implementar interfaz de login, gestión de empresas/usuarios y permisos. No aplicar migraciones a producción desde una máquina de desarrollo.
 
 ## GitHub, Vercel y Render
 
 El repositorio local está enlazado con `aaaveliz-cloud/QuickFact`. Los cambios se preparan en ramas `codex/` y se revisan mediante Pull Request a `main`. No subir `.env`, certificados ni contraseñas.
 
-Cuando el backend y la base de datos estén listos, configurar Vercel con raíz `apps/web` y Render desde la raíz del repositorio, con build `pnpm install --frozen-lockfile && pnpm --filter @quickfact/api build` y start `pnpm --filter @quickfact/api start`. Configurar `WEB_ORIGIN` con el origen HTTPS del frontend y `NEXT_PUBLIC_API_URL` con la URL pública de la API. Secretos sólo en el backend. No desplegar producción en esta fase.
+Cuando el backend y la base de datos estén listos, configurar Vercel con raíz `apps/web` y Render desde la raíz del repositorio, con build `pnpm install --frozen-lockfile && pnpm --filter @quickfact/api build` y start `pnpm --filter @quickfact/api start`. Configurar `WEB_ORIGIN` con el origen HTTPS del frontend y `API_URL` en Vercel con el origen HTTPS del backend. El navegador utiliza `/api` en el dominio de la web. Secretos sólo en el backend. No desplegar producción en esta fase.
 
 Certificados, XML, RIDE y soportes necesitarán almacenamiento persistente privado. No usar el filesystem efímero de Render. La integración SRI requerirá verificar documentación oficial vigente.
