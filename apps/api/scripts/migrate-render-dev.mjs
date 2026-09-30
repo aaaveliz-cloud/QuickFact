@@ -27,6 +27,8 @@ try {
       const log = record.logs ?? '';
       const codes = [...new Set(log.match(/\bP\d{4}\b|\bE[0-9A-Z]{5}\b/g) ?? [])];
       const hints = ['permission denied', 'btree_gist', 'already exists', 'does not exist', 'not supported', 'must be owner', 'superuser', 'syntax error', 'for database', 'for schema', 'for table', 'for function', 'for language', 'for extension', 'to set parameter'].filter(s => log.includes(s));
+      const parameter = log.match(/permission denied to set parameter [\\"']*([a-zA-Z_][a-zA-Z0-9_.]*)/)?.[1];
+      if (parameter) console.error(`Denied PostgreSQL parameter identifier: ${parameter}.`);
       console.error(`Existing failed migration: codes ${codes.join(', ') || 'none'}; known hints ${hints.join(', ') || 'none'}.`);
     }
   }
