@@ -6,7 +6,7 @@ Resultados locales de la sesión del 29 de septiembre de 2026 (America/Guayaquil
 - `pnpm build`: frontend y backend compilan correctamente.
 - `pnpm typecheck`: sin errores en ambos proyectos.
 - `pnpm lint`: sin errores en ambos proyectos.
-- `pnpm test`: seis pruebas HTTP/configuración de la API aprobadas.
+- `pnpm test`: once pruebas HTTP/configuración de la API y lectura PKCS#12 aprobadas.
 - `pnpm db:validate`: esquema Prisma válido.
 - `pnpm audit --prod`: sin vulnerabilidades conocidas reportadas en esta verificación.
 - Comprobadas las exclusiones Git de `.env`, `.env.local`, `.p12` y `.key`.
@@ -19,4 +19,4 @@ Avisos consultados: [deepmerge-ts](https://github.com/advisories/GHSA-ggr8-5vv4-
 
 ## Límites de esta verificación
 
-No se conectó PostgreSQL ni se ejecutaron migraciones. No hay endpoints de negocio, login, permisos operativos, pruebas de aislamiento entre empresas, SRI, correo, almacenamiento persistente ni despliegue. El health check sólo comprueba el proceso. Estas comprobaciones no acreditan todavía la seguridad o funcionalidad del SaaS completo.
+No se conectó PostgreSQL ni se ejecutaron migraciones. El lector de certificados es un servicio backend sin ruta HTTP ni persistencia; limitado a RSA compatible con node-forge, sin validación de cadena, revocación ni identidad fiscal. No hay endpoints de negocio, login, permisos operativos, pruebas de aislamiento entre empresas, SRI, correo, almacenamiento persistente ni despliegue. El health check sólo comprueba el proceso. Estas comprobaciones no acreditan todavía la seguridad o funcionalidad del SaaS completo.

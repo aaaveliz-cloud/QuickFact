@@ -25,7 +25,7 @@ No presentar el esquema preliminar como garantía de aislamiento. La seguridad d
 
 ## Accesos pendientes
 
-- Enlace del repositorio GitHub existente; revisar su historial antes de enlazarlo o publicar cambios.
+- Repositorio GitHub identificado: `aaaveliz-cloud/QuickFact`; historial previo revisado e integrado con la base local.
 - Identificación de proyectos o servicios existentes en Vercel y Render.
 - PostgreSQL de desarrollo; credenciales configuradas localmente o en las plataformas, nunca en el chat ni en Git.
 - Almacenamiento persistente privado y correo, cuando se implementen esos módulos.
