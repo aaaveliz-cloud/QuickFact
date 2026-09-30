@@ -1,5 +1,5 @@
 name: QuickFact Render development database
-# Administrative diagnostics contain codes only, never raw connection errors.
+# Administrative diagnostics contain codes and fixed hints, never raw errors.
 
 on:
   push:

@@ -21,6 +21,15 @@ try {
   client = new pg.Client({ connectionString: connection.href, connectionTimeoutMillis: 15000 });
   await client.connect();
   console.log('Authorized Render development database connected over verified TLS.');
+  if ((await client.query("SELECT to_regclass('public._prisma_migrations') IS NOT NULL AS present")).rows[0].present) {
+    const failed = await client.query('SELECT logs FROM public._prisma_migrations WHERE finished_at IS NULL AND rolled_back_at IS NULL');
+    for (const record of failed.rows) {
+      const log = record.logs ?? '';
+      const codes = [...new Set(log.match(/\bP\d{4}\b|\bE[0-9A-Z]{5}\b/g) ?? [])];
+      const hints = ['permission denied', 'btree_gist', 'already exists', 'does not exist', 'not supported', 'must be owner', 'superuser', 'syntax error'].filter(s => log.includes(s));
+      console.error(`Existing failed migration: codes ${codes.join(', ') || 'none'}; known hints ${hints.join(', ') || 'none'}.`);
+    }
+  }
   const migration = spawnSync('pnpm', ['exec', 'prisma', 'migrate', 'deploy'], {
     env: { ...process.env, MIGRATION_DATABASE_URL: connection.href },
     encoding: 'utf8', timeout: 180000, maxBuffer: 1024 * 1024,
